@@ -6,6 +6,7 @@ scala2 = "2.13.10"
 junitCore = "4.13.2"
 slf4j = "2.0.6"
 logback = "1.4.5"
+kotlin = "1.9.10"
 
 [libraries]
 junit-api = {module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit"}
@@ -18,3 +19,6 @@ alchemistScafi = {module = "it.unibo.alchemist:alchemist-incarnation-scafi", ver
 slf4j = {module = "org.slf4j:slf4j-api", version.ref = "slf4j"}
 logback = {module = "ch.qos.logback:logback-classic", version.ref = "logback"}
 alchemistGui = {module = "it.unibo.alchemist:alchemist-swingui", version.ref = "alchemist"}
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

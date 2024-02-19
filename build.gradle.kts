@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("scala")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 scala {
@@ -56,7 +57,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             }
             // These are the program arguments
             args("-y", it.absolutePath, "-e", "$exportsDir/${it.nameWithoutExtension}-${System.currentTimeMillis()}")
-            args("-b")
+            //args("-b")
             jvmArgs("-Dscalapy.python.library=python3.11")
             // This tells gradle that this task may modify the content of the export directory
             outputs.dir(exportsDir)
