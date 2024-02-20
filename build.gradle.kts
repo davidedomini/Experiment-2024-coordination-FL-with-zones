@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("scala")
     alias(libs.plugins.kotlin.jvm)
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 scala {
@@ -34,6 +35,8 @@ dependencies {
     implementation(libs.alchemist)
     implementation(libs.alchemistGui)
     implementation(libs.alchemistScafi)
+    implementation(libs.bundles.alchemist.pm10)
+    implementation(libs.kotlinxSerialization)
 }
 
 File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
