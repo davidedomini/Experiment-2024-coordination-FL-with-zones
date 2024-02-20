@@ -9,10 +9,14 @@ class PM10Connections : LinkingRule<Any, GeoPosition> {
         center: Node<Any>?,
         environment: Environment<Any, GeoPosition>?
     ): Neighborhood<Any> {
-        val rangeLink = 800_000.0
+        val rangeLink = 100_000.0
+        val maxNeighbors = 10
         val close = environment!!
             .getNodesWithinRange(center, rangeLink)
-            .associateWith { environment.getDistanceBetweenNodes(center, it) }
+            .map { it to environment.getDistanceBetweenNodes(center, it) }
+            .sortedBy { it.second }
+            .take(maxNeighbors)
+            .toMap()
         return Neighborhoods.make(environment, center!!, close.keys)
     }
 
