@@ -15,7 +15,7 @@ class SelfOrganisingCoordinationRegions
     with ScafiAlchemistSupport {
 
   private val radius = 200 // TODO - update
-  private val localModel: py.Dynamic = utils.init_local_model()
+  private val localModel: py.Dynamic = utils.rnn_factory()
   private val every = 5 // TODO - check
 
   override def main(): Unit = {
@@ -35,7 +35,13 @@ class SelfOrganisingCoordinationRegions
     }
   }
 
-  private def averageWeights(models: Set[py.Dynamic]): py.Dynamic = ???
+  private def averageWeights(models: Set[py.Dynamic]): py.Dynamic = {
+    val averageWeights = utils.average_weights(models.toSeq.toPythonProxy)
+    val freshRNN = utils.rnn_factory()
+    freshRNN.load_state_dict(averageWeights)
+    freshRNN
+  }
+
   private def evolve(model: py.Dynamic, data: py.Dynamic): py.Dynamic = ???
   private def evaluate(model: py.Dynamic, data: py.Dynamic): Int = ???
 
