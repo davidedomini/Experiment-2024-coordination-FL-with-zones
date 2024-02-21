@@ -38,7 +38,7 @@ class PM10 : Deployment<GeoPosition> {
         }
 
         private fun loadFromJson(): List<Station> =
-            Json.decodeFromString<List<Station>>(File("PM10-data/data-summary-test.json").readText())
+            Json.decodeFromString<List<Station>>(File("PM10-data/data-summary3.json").readText())
     }
 
 }
