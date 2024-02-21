@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.alchemistScafi)
     implementation(libs.bundles.alchemist.pm10)
     implementation(libs.kotlinxSerialization)
+    implementation(libs.fastcsv)
 }
 
 File(rootProject.rootDir.path + "/src/main/yaml").listFiles()

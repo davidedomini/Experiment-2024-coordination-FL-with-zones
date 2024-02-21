@@ -21,6 +21,8 @@ logback = {module = "ch.qos.logback:logback-classic", version.ref = "logback"}
 alchemistGui = {module = "it.unibo.alchemist:alchemist-swingui", version.ref = "alchemist"}
 alchemist-maps = { module = "it.unibo.alchemist:alchemist-maps", version.ref = "alchemist" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.6.3"}
+fastcsv = { module = "de.siegmar:fastcsv", version = "3.0.0"}
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
