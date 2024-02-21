@@ -1,0 +1,23 @@
+incarnation: scafi
+
+environment:
+  type: OSMEnvironment
+
+network-model:
+  type: Pm10Connections
+
+_reactions:
+  - program: &program
+      - time-distribution:
+          type: DiracComb
+          parameters: [ 0.0,  1.0 ]
+        type: Event
+        actions:
+          - type: RunScafiProgram
+            parameters: [ it.unibo.SelfOrganisingCoordinationRegions ]
+      - program: send
+
+deployments:
+  type: PM10
+  programs:
+    - *program
