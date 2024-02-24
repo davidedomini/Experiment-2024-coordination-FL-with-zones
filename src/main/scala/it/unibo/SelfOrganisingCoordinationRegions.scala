@@ -5,6 +5,7 @@ import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import de.siegmar.fastcsv.reader.CsvReader
 import it.unibo.PythonModules._
 import me.shadaj.scalapy.py
+import me.shadaj.scalapy.py.PyQuote
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -14,24 +15,24 @@ class SelfOrganisingCoordinationRegions
     with StandardSensors
     with ScafiAlchemistSupport {
 
-  private val radius = 200 // TODO - update
+  private val radius = 200
   private val localModel: py.Dynamic = utils.rnn_factory()
-  private val every = 5 // TODO - check
+  private val every = 5
+  private val epochs = 2
 
   override def main(): Unit = {
-    node.put("id", mid())
-    val eoiCode = findStationCode() // TODO - check code name
+    val eoiCode = findStationCode()
     val data: py.Dynamic = utils.get_dataset(eoiCode)
     val aggregators = S(radius, nbrRange)
-    rep((localModel, 0)) { p => // TODO - add evaluation and logging
+    rep((localModel, 0)) { p =>
       val model = p._1
-      val tick = p._2
+      val tick = p._2 + 1
       val evolvedModel = evolve(model, data)
       val potential = classicGradient(aggregators)
-      val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(evolvedModel), Set.empty)
+      val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(sample(evolvedModel)), Set.empty)
       val aggregatedModel = averageWeights(info)
       val sharedModel = broadcast(aggregators, aggregatedModel)
-        mux(impulsesEvery(tick)){ (averageWeights(Set(sharedModel, evolvedModel)), tick+1) } { (evolvedModel, tick+1) }
+      mux(impulsesEvery(tick)){ (averageWeights(Set(sharedModel, evolvedModel)), tick) } { (evolvedModel, tick) }
     }
   }
 
@@ -42,8 +43,25 @@ class SelfOrganisingCoordinationRegions
     freshRNN
   }
 
-  private def evolve(model: py.Dynamic, data: py.Dynamic): py.Dynamic = ???
-  private def evaluate(model: py.Dynamic, data: py.Dynamic): Int = ???
+  private def sample(model: py.Dynamic): py.Dynamic = model.state_dict()
+
+  private def evolve(model: py.Dynamic, data: py.Dynamic): (py.Dynamic, py.Dynamic) = {
+    val trainLoader = utils.get_train_loader(data)
+    val result = utils.train(model, epochs, trainLoader)
+    val newWeights = py"$result[0]"
+    val loss = py"$result[1]"
+    val freshRNN = utils.rnn_factory()
+    freshRNN.load_state_dict(newWeights)
+    (freshRNN, loss)
+  }
+
+  private def evaluate(model: py.Dynamic, data: py.Dynamic): (Double, Double) = {
+    val validloader = utils.val_data_loader(data)
+    val evaluationResult = utils.evaluate(model, validloader)
+    val accuracy = py"$evaluationResult[0]"
+    val loss = py"$evaluationResult[1]"
+    (loss.asInstanceOf[Double], accuracy.asInstanceOf[Double])
+  }
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
 
