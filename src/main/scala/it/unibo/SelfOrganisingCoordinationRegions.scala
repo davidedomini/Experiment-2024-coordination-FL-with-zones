@@ -27,11 +27,14 @@ class SelfOrganisingCoordinationRegions
     rep((localModel, 0)) { p =>
       val model = p._1
       val tick = p._2 + 1
-      val evolvedModel = evolve(model, data)
+      val (evolvedModel, trainLoss, valLoss) = evolve(model, data)
+      node.put("TrainLoss", trainLoss)
+      node.put("ValidationLoss", valLoss)
       val potential = classicGradient(aggregators)
       val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(sample(evolvedModel)), Set.empty)
       val aggregatedModel = averageWeights(info)
       val sharedModel = broadcast(aggregators, aggregatedModel)
+      if (aggregators) { snapshot(sharedModel, eoiCode, tick-1) }
       mux(impulsesEvery(tick)){ (averageWeights(Set(sharedModel, evolvedModel)), tick) } { (evolvedModel, tick) }
     }
   }
@@ -45,22 +48,16 @@ class SelfOrganisingCoordinationRegions
 
   private def sample(model: py.Dynamic): py.Dynamic = model.state_dict()
 
-  private def evolve(model: py.Dynamic, data: py.Dynamic): (py.Dynamic, py.Dynamic) = {
-    val trainLoader = utils.get_train_loader(data)
-    val result = utils.train(model, epochs, trainLoader)
+  private def evolve(model: py.Dynamic, data: py.Dynamic): (py.Dynamic, py.Dynamic, py.Dynamic) = {
+    val trainLoader = data.get_train_loader()
+    val valLoader = data.get_val_loader()
+    val result = utils.local_train(model, epochs, trainLoader, valLoader)
     val newWeights = py"$result[0]"
-    val loss = py"$result[1]"
+    val trainLoss = py"$result[1]"
+    val valLoss = py"$result[2]"
     val freshRNN = utils.rnn_factory()
     freshRNN.load_state_dict(newWeights)
-    (freshRNN, loss)
-  }
-
-  private def evaluate(model: py.Dynamic, data: py.Dynamic): (Double, Double) = {
-    val validloader = utils.val_data_loader(data)
-    val evaluationResult = utils.evaluate(model, validloader)
-    val accuracy = py"$evaluationResult[0]"
-    val loss = py"$evaluationResult[1]"
-    (loss.asInstanceOf[Double], accuracy.asInstanceOf[Double])
+    (freshRNN, trainLoss, valLoss)
   }
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
@@ -81,5 +78,12 @@ class SelfOrganisingCoordinationRegions
 
   private def checkLatLon(nodeLat: String, nodeLon: String, csvLat: String, csvLon: String): Boolean =
     csvLat.contains(nodeLat) && csvLon.contains(nodeLon)
+
+  private def snapshot(model: py.Dynamic, eoiCode: String, time: Int): Unit = {
+    torch.save(
+      model.state_dict(),
+        s"networks/station-$eoiCode-$time"
+    )
+  }
 
 }
