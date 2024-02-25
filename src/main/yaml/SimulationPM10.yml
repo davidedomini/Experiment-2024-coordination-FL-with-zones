@@ -4,7 +4,7 @@ environment:
   type: OSMEnvironment
 
 network-model:
-  type: Pm10Connections
+  type: PM10Connections
 
 _reactions:
   - program: &program
