@@ -15,7 +15,7 @@ class SelfOrganisingCoordinationRegions
     with StandardSensors
     with ScafiAlchemistSupport {
 
-  private val radius = 200
+  private val radius = 200_000
   private val localModel: py.Dynamic = utils.rnn_factory()
   private val every = 5
   private val epochs = 2
