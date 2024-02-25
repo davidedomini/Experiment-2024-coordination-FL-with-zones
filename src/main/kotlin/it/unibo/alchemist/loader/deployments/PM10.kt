@@ -12,8 +12,7 @@ import kotlinx.serialization.Serializable
 data class Station (
     val name: String,
     val latitude: String,
-    val longitude: String,
-    val file_path: String
+    val longitude: String
 )
 
 class PM10 : Deployment<GeoPosition> {
@@ -38,7 +37,7 @@ class PM10 : Deployment<GeoPosition> {
         }
 
         private fun loadFromJson(): List<Station> =
-            Json.decodeFromString<List<Station>>(File("PM10-data/data-summary3.json").readText())
+            Json.decodeFromString<List<Station>>(File("PM10-data/data-summary.json").readText())
     }
 
 }
