@@ -28,8 +28,8 @@ class SelfOrganisingCoordinationRegions
       val model = p._1
       val tick = p._2 + 1
       val (evolvedModel, trainLoss, valLoss) = evolve(model, data)
-      node.put("TrainLoss", trainLoss)
-      node.put("ValidationLoss", valLoss)
+      node.put("TrainLoss", trainLoss.as[Double])
+      node.put("ValidationLoss", valLoss.as[Double])
       val potential = classicGradient(aggregators)
       val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(sample(evolvedModel)), Set.empty)
       val aggregatedModel = averageWeights(info)
