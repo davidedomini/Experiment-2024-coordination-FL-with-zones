@@ -52,9 +52,9 @@ class SelfOrganisingCoordinationRegions
     val trainLoader = data.get_train_loader()
     val valLoader = data.get_val_loader()
     val result = utils.local_train(model, epochs, trainLoader, valLoader)
-    val newWeights = py"$result[0]"
-    val trainLoss = py"$result[1]"
-    val valLoss = py"$result[2]"
+    val trainLoss = py"$result[0]"
+    val valLoss = py"$result[1]"
+    val newWeights = py"$result[2]"
     val freshRNN = utils.rnn_factory()
     freshRNN.load_state_dict(newWeights)
     (freshRNN, trainLoss, valLoss)
