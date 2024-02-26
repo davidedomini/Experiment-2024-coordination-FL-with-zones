@@ -35,7 +35,7 @@ class SelfOrganisingCoordinationRegions
       val aggregatedModel = averageWeights(info)
       val sharedModel = broadcast(aggregators, aggregatedModel)
       if (aggregators) { snapshot(sharedModel, eoiCode, tick-1) }
-      mux(impulsesEvery(tick)){ (averageWeights(Set(sharedModel, evolvedModel)), tick) } { (evolvedModel, tick) }
+      mux(impulsesEvery(tick)){ (averageWeights(Set(sample(sharedModel), sample(evolvedModel))), tick) } { (evolvedModel, tick) }
     }
   }
 
