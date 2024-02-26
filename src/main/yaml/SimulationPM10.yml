@@ -21,3 +21,23 @@ deployments:
   type: PM10
   programs:
     - *program
+
+export:
+  - type: CSVExporter
+    parameters:
+      fileNameRoot: "simulation_pm10"
+      exportPath: "alchemist-data/"
+      interval: 1
+    data:
+      - time
+      - molecule: TrainLoss
+        value-filter: onlyfinite
+        aggregators: [ min, max, mean ]
+      - molecule: ValidationLoss
+        value-filter: onlyfinite
+        aggregators: [ min, max, mean ]
+
+
+terminate:
+  - type: AfterTime
+    parameters: 250
