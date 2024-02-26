@@ -9,7 +9,7 @@ class PM10Connections : LinkingRule<Any, GeoPosition> {
         center: Node<Any>?,
         environment: Environment<Any, GeoPosition>?
     ): Neighborhood<Any> {
-        val rangeLink = 100_000.0
+        val rangeLink = 200_000.0
         val maxNeighbors = 10
         val close = environment!!
             .getNodesWithinRange(center, rangeLink)
